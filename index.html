@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Чекліст: сайт, що продає</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Unbounded:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#FAF7F0;--dark:#141414;--mustard:#E3B023;--wine:#5A0F1C}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--cream);color:var(--dark);font:500 17px/1.45 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:-.01em}
+.wrap{max-width:640px;margin:0 auto;padding:0 20px 120px}
+h1,h2{font-family:Unbounded,system-ui,sans-serif;font-weight:600;text-transform:lowercase;letter-spacing:-.045em;margin:0}
+.hero{padding:44px 0 22px}
+.hero h1{font-size:clamp(36px,11vw,58px);line-height:1.08}
+.plate{display:inline-block;background:var(--dark);color:var(--cream);padding:0 .12em;margin-left:-.04em}
+.lead{margin:18px 0 0;font-size:16px;max-width:30em}
+.tabs{display:flex;gap:10px;margin:24px 0 8px}
+.tab{flex:1;font:inherit;font-size:15px;line-height:1.25;padding:14px 12px;border:3px solid var(--dark);border-radius:16px;background:transparent;color:var(--dark);cursor:pointer;text-align:center}
+.tab[aria-selected="true"]{background:var(--dark);color:var(--cream)}
+.bar{position:sticky;top:0;z-index:5;background:var(--cream);padding:12px 0 10px;margin-top:6px}
+.bar .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:15px}
+.bar .row b{font-weight:500;font-family:Unbounded,system-ui,sans-serif;font-size:18px;letter-spacing:-.03em}
+.track{height:12px;border-radius:8px;background:#E8E2D2;margin-top:8px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--dark);border-radius:8px;transition:width .25s ease}
+.sec{border-radius:28px;padding:26px 20px 14px;margin:18px 0}
+.sec h2{font-size:clamp(28px,8vw,40px);line-height:1.08}
+.sec p.sub{margin:10px 0 14px;font-size:15px}
+.sec.cr{background:#F1ECDD}
+.sec.mu{background:var(--mustard)}
+.sec.wn{background:var(--wine);color:var(--cream)}
+.sec.wn .plate{background:var(--cream);color:var(--wine)}
+.sec.mu .plate,.sec.cr .plate{background:var(--dark);color:var(--cream)}
+.item{display:flex;gap:16px;align-items:flex-start;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:14px 0;cursor:pointer;border-top:2px solid rgba(20,20,20,.12)}
+.sec.wn .item{border-top-color:rgba(250,247,240,.2)}
+.item:first-of-type{border-top:0}
+.box{flex:none;width:34px;height:34px;border:4px solid currentColor;border-radius:10px;display:grid;place-items:center;margin-top:1px;transition:background .15s}
+.box svg{width:20px;height:20px;opacity:0;transform:scale(.6);transition:all .15s}
+.item[aria-checked="true"] .box{background:currentColor}
+.item[aria-checked="true"] .box svg{opacity:1;transform:none}
+.item[aria-checked="true"] .box svg{stroke:var(--cream)}
+.sec.mu .item[aria-checked="true"] .box svg{stroke:var(--mustard)}
+.sec.wn .item[aria-checked="true"] .box svg{stroke:var(--wine)}
+.item[aria-checked="true"] .t{opacity:.55}
+.item:focus-visible{outline:3px solid var(--dark);outline-offset:2px}
+.sec.wn .item:focus-visible{outline-color:var(--cream)}
+.result{background:var(--dark);color:var(--cream);border-radius:28px;padding:26px 22px;margin:22px 0}
+.result h2{font-size:clamp(26px,7.5vw,36px);line-height:1.1;margin-bottom:12px}
+.result p{margin:0 0 18px}
+.result .w{color:var(--mustard)}
+.cta{display:inline-block;background:var(--mustard);color:var(--dark);text-decoration:none;border-radius:999px;padding:16px 24px;font-size:16px}
+.reset{display:block;margin:6px auto 0;background:none;border:0;font:inherit;font-size:14px;color:var(--dark);text-decoration:underline;cursor:pointer;padding:10px}
+.foot{margin-top:30px;font-size:14px;opacity:.7}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>чекліст:<br>сайт,<br>що <span class="plate">продає</span></h1>
+    <p class="lead">Натискайте на пункт, якщо відповідь «так». Внизу побачите, що варто підтягнути. Це орієнтири, а не гарантія результату.</p>
+    <div class="tabs" role="tablist" aria-label="Оберіть, що перевіряємо">
+      <button class="tab" role="tab" id="tab-site" aria-selected="true" data-mode="site">У мене є сайт</button>
+      <button class="tab" role="tab" id="tab-insta" aria-selected="false" data-mode="insta">Лише Instagram</button>
+    </div>
+  </header>
+
+  <div class="bar" aria-live="polite">
+    <div class="row"><span id="label">перевірено</span><b id="count">0 з 0</b></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <main id="main"></main>
+
+  <section class="result" id="result">
+    <h2 id="rtitle"></h2>
+    <p id="rtext"></p>
+    <a class="cta" id="cta" href="https://www.instagram.com/ss_sunrise/" target="_blank" rel="noopener">Написати мені в Direct</a>
+  </section>
+  <button class="reset" id="reset" type="button">Почати спочатку</button>
+  <p class="foot">@ss_sunrise</p>
+</div>
+
+<script>
+(function(){
+  var DATA={
+    site:[
+      {cls:'cr',title:'<span class="plate">перший</span> екран',sub:'що бачить людина, коли відкриває сайт',items:[
+        'заголовок про вигоду клієнта, а не про вас',
+        'зрозуміло, що саме ви пропонуєте і для кого',
+        'вказано місто або район роботи',
+        'одна головна кнопка з конкретною дією',
+        'звʼязок в один дотик: дзвінок або Telegram',
+        'суть можна зрозуміти за кілька секунд']},
+      {cls:'mu',title:'що дає <span class="plate">довіру</span>',sub:'чому вам повірять і напишуть',items:[
+        'є реальні фото, а не лише стокові',
+        'є відгуки або приклади робіт',
+        'зрозуміло, що входить у послугу і як її замовити',
+        'вказано терміни й умови',
+        'немає вигаданих цифр і гучних обіцянок']},
+      {cls:'cr',title:'<span class="plate">тексти</span> без води',sub:'щоб відповідь знаходили одразу',items:[
+        'короткі абзаци, а не суцільний текст',
+        'заголовки пояснюють, про що розділ',
+        'одна мова на всій сторінці',
+        'без складних слів і довгих вступів',
+        'тексти перечитано вголос, без помилок']},
+      {cls:'mu',title:'телефон і <span class="plate">заявка</span>',sub:'клієнти часто відкривають сайт із телефона',items:[
+        'усе читається без збільшення',
+        'кнопки достатньо великі для пальця',
+        'усі кнопки й посилання працюють: натисніть кожну',
+        'сторінка відкривається швидко',
+        'у формі мінімум полів: імʼя й телефон',
+        'після відправки видно підтвердження',
+        'заявка справді доходить до вас: перевірено тестом']}
+    ],
+    insta:[
+      {cls:'wn',title:'сайту нема? <span class="plate">instagram</span>',sub:'тоді перевірте профіль: це теж ваша вітрина',items:[
+        'у шапці: чим займаєтесь і для кого',
+        'вказано місто або район',
+        'є кнопка звʼязку, і вона працює',
+        'у Direct відповідаєте швидко',
+        'у закріплених: з чого почати новому клієнтові']},
+      {cls:'cr',title:'ціни й <span class="plate">вибір</span>',sub:'щоб клієнт знайшов потрібне в Instagram',items:[
+        'ціни або «від скількох» видно, а не лише «ціна в Direct»',
+        'конкретний товар чи послугу можна знайти за кілька дотиків',
+        'актуальні розділені за категоріями',
+        'у дописі: назва, ціна, як замовити',
+        'відгуки зібрані в одному місці',
+        'видно, що актуально зараз: наявність і терміни']}
+    ]
+  };
+  var CHECK='<svg viewBox="0 0 24 24" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var mode='site', state={site:{},insta:{}};
+  var $=function(id){return document.getElementById(id)};
+  function load(){try{var s=localStorage.getItem('ss-checklist');if(s){var o=JSON.parse(s);if(o&&o.site&&o.insta)state=o}}catch(e){}}
+  function save(){try{localStorage.setItem('ss-checklist',JSON.stringify(state))}catch(e){}}
+  function total(m){return DATA[m].reduce(function(a,s){return a+s.items.length},0)}
+  function done(m){return Object.keys(state[m]).filter(function(k){return state[m][k]}).length}
+  function render(){
+    var h='';
+    DATA[mode].forEach(function(s,si){
+      h+='<section class="sec '+s.cls+'"><h2>'+s.title+'</h2><p class="sub">'+s.sub+'</p>';
+      s.items.forEach(function(t,ii){
+        var k=si+'-'+ii, on=!!state[mode][k];
+        h+='<button type="button" class="item" role="checkbox" aria-checked="'+on+'" data-k="'+k+'"><span class="box">'+CHECK+'</span><span class="t">'+t+'</span></button>';
+      });
+      h+='</section>';
+    });
+    $('main').innerHTML=h;
+    update();
+  }
+  function update(){
+    var n=done(mode), t=total(mode);
+    $('count').textContent=n+' з '+t;
+    $('fill').style.width=(t?n/t*100:0)+'%';
+    var title,text;
+    if(n===0){title='відмічайте пункти';text='Пройдіться по списку: що вже є — натисніть.';}
+    else if(n===t){title='усе відмічено';text='Добрий результат. Якщо хочете, можна ще звірити деталі разом: напишіть, і я подивлюся ваш '+(mode==='site'?'сайт':'профіль')+'.';}
+    else{title='без галочки: '+(t-n);text='Ці пункти варто підтягнути в першу чергу. Напишіть мені, скільки лишилось без галочки: підкажу, з чого почати саме у вас. А щоб я зробив усе за вас, напишіть слово «ціна».';}
+    $('rtitle').textContent=title;$('rtext').textContent=text;
+  }
+  document.addEventListener('click',function(e){
+    var it=e.target.closest&&e.target.closest('.item');
+    if(it){var k=it.getAttribute('data-k');state[mode][k]=!state[mode][k];it.setAttribute('aria-checked',String(!!state[mode][k]));save();update();return}
+    var tb=e.target.closest&&e.target.closest('.tab');
+    if(tb){mode=tb.getAttribute('data-mode');
+      ['site','insta'].forEach(function(m){$('tab-'+m).setAttribute('aria-selected',String(m===mode))});
+      render();window.scrollTo(0,0);return}
+    if(e.target.id==='reset'){state[mode]={};save();render()}
+  });
+  load();render();
+})();
+</script>
+</body>
+</html>
