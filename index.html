@@ -56,6 +56,7 @@ h1,h2{font-family:Unbounded,system-ui,sans-serif;font-weight:600;text-transform:
 .foot{margin-top:30px;font-size:14px;opacity:.7}
 [hidden]{display:none!important}
 </style>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="c2e4ae22-73c0-464f-8e82-1b480ce2b5c4"></script>
 </head>
 <body>
 <div class="wrap">
@@ -81,7 +82,7 @@ h1,h2{font-family:Unbounded,system-ui,sans-serif;font-weight:600;text-transform:
     <a class="cta" id="cta" href="https://www.instagram.com/ss_sunrise/" target="_blank" rel="noopener">Написати мені в Direct</a>
   </section>
   <button class="reset" id="reset" type="button">Почати спочатку</button>
-  <p class="foot">@ss_sunrise</p>
+  <p class="foot">@ss_sunrise · анонімна статистика візитів</p>
 </div>
 
 <script>
@@ -164,13 +165,17 @@ h1,h2{font-family:Unbounded,system-ui,sans-serif;font-weight:600;text-transform:
   }
   document.addEventListener('click',function(e){
     var it=e.target.closest&&e.target.closest('.item');
-    if(it){var k=it.getAttribute('data-k');state[mode][k]=!state[mode][k];it.setAttribute('aria-checked',String(!!state[mode][k]));save();update();return}
+    if(it){var k=it.getAttribute('data-k');state[mode][k]=!state[mode][k];it.setAttribute('aria-checked',String(!!state[mode][k]));save();update();ping();return}
     var tb=e.target.closest&&e.target.closest('.tab');
     if(tb){mode=tb.getAttribute('data-mode');
       ['site','insta'].forEach(function(m){$('tab-'+m).setAttribute('aria-selected',String(m===mode))});
-      render();window.scrollTo(0,0);return}
+      render();window.scrollTo(0,0);track('tab',{mode:mode});return}
     if(e.target.id==='reset'){state[mode]={};save();render()}
   });
+  var T=null;
+  function track(n,d){try{if(window.umami&&umami.track)umami.track(n,d)}catch(e){}}
+  function ping(){clearTimeout(T);T=setTimeout(function(){track('progress',{mode:mode,done:done(mode),total:total(mode)})},1500)}
+  $('cta').addEventListener('click',function(){track('cta-direct',{mode:mode,done:done(mode),total:total(mode)})});
   load();render();
 })();
 </script>
