@@ -708,19 +708,19 @@ body.chat-on .fab{transform:translateY(160%)!important}
 .theme-dark .theme-t .ic-sun{display:block}
 .theme-dark .theme-t .ic-moon{display:none}
 @media(max-width:1020px){.theme-t{margin-right:10px}}
-html.theme-dark{--paper:#0F0D0B;--paper2:#17140F;--card:#1E1A16;--ink:#F3EEE5;--ink2:#E6DED2;--ink3:#D8CFC2;--muted:#A79D90;--line:rgba(243,238,229,.14);color-scheme:dark}
+html.theme-dark{--paper:#221E1A;--paper2:#2A2520;--card:#312C26;--ink:#F3EEE5;--ink2:#E6DED2;--ink3:#D8CFC2;--muted:#A79D90;--line:rgba(243,238,229,.14);color-scheme:dark}
 html.theme-dark :is(.dark,.ftr,.mnav,.modal__panel,.hero__end,.caps,.hero__steps,.bill,.mbill,.tk,.st,.vs__t,.hero__chef,.pre__ticket,.chef__media .sign,.pc__tag,.ba__h,.mini,.mbk__stage,.pc__img--3d,.pp,.menu){--paper:#F3EEE5;--paper2:#EAE2D4;--card:#FBF8F2;--ink:#171411;--ink2:#221E1A;--ink3:#2E2823;--muted:#6F665C;--line:rgba(23,20,17,.14);color-scheme:light}
 html.theme-dark :is(.tk,.st,.vs__t,.hero__chef,.bill,.mbill,.menu,.pc__tag,.chef__media .sign,.mini){color:var(--ink)}
-html.theme-dark .dark{background:#171411}
-html.theme-dark .hdr__bg{background:rgba(15,13,11,.82)}
+html.theme-dark .dark{background:#191613}
+html.theme-dark .hdr__bg{background:rgba(34,30,26,.86)}
 html.theme-dark .hdr.on-dark{color:#F3EEE5}
 html.theme-dark .hdr.on-dark .hdr__c a:hover{background:#F3EEE5;color:#171411}
 html.theme-dark .menu-open .hdr{color:#F3EEE5}
 html.theme-dark .btn--red::after{background:#F3EEE5}
 html.theme-dark .btn--red:hover{color:#171411}
-html.theme-dark .hero__facts span{background:rgba(30,26,22,.8)}
+html.theme-dark .hero__facts span{background:rgba(49,44,38,.75)}
 html.theme-dark .hero h1 em,html.theme-dark h2 em{color:#E0502F}
-html.theme-dark .pre{background:#0F0D0B}
+html.theme-dark .pre{background:#221E1A}
 html.theme-dark .loss__x span{background-image:linear-gradient(#E0502F,#E0502F)}
 html.theme-dark .theme-t{color:inherit}
 html.theme-ready body,html.theme-ready .hdr__bg,html.theme-ready .sec{transition:background-color .5s var(--ease),color .5s var(--ease)}
