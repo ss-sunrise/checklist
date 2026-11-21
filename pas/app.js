@@ -124,9 +124,10 @@ const CONFIG = {
   function heroGeo() {
     const w = innerWidth, h = Math.max(innerHeight, 640);
     if (isMob()) {
-      const ph = pin.offsetHeight || h, cta = $('.hero__facts') || $('.hero__cta'), r = Math.min(w * 0.42, 190);
+      const ph = pin.offsetHeight || h, cta = $('.hero__facts') || $('.hero__cta');
       const cb = cta.offsetTop + cta.offsetHeight + $('.hero__copy').offsetTop;
-      let cy = cb + r + 48; if (ph - (cy - r) < 150) cy = ph - 150 + r;
+      const r = Math.min(w * 0.42, 190, Math.max(120, (ph - cb - 40) / 1.7));
+      let cy = cb + r + 68; if (ph - (cy - r) < 120) cy = ph - 120 + r;
       return { x: 50, y: cy / ph * 100, r };
     }
     return { x: 75.5, y: 53, r: Math.min(h * 0.3, w * 0.175, 320) };
@@ -549,25 +550,26 @@ const CONFIG = {
     scroll();
   });
   const esc = t => t.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const askName = id => new Promise(res => {
+  const askName = (id, ph = 'Назва закладу', skipT = 'Ще не придумав(-ла)') => new Promise(res => {
     if (id !== run) return;
     replies.innerHTML = ''; replies.classList.add('show', 'inp');
     const f = document.createElement('form'); f.className = 'phone__inp';
-    f.innerHTML = '<input type="text" maxlength="28" placeholder="Назва закладу" aria-label="Назва закладу" autocomplete="off"><button type="submit" aria-label="Надіслати">➤</button>';
-    const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'skip'; skip.textContent = 'Ще не придумав(-ла)';
+    f.innerHTML = '<input type="text" maxlength="40" autocomplete="off"><button type="submit" aria-label="Надіслати">➤</button>'; f.querySelector('input').placeholder = ph; f.querySelector('input').setAttribute('aria-label', ph);
+    const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'skip'; skip.textContent = skipT;
     const done = v => { replies.classList.remove('show', 'inp'); replies.innerHTML = ''; res(v); };
     f.addEventListener('submit', e => { e.preventDefault(); const v = f.querySelector('input').value.trim().replace(/\s+/g, ' '); if (!v) { f.querySelector('input').focus(); return; } bubble('me', esc(v)); done(v); });
-    skip.addEventListener('click', () => { bubble('me', 'Ще не придумав(-ла)'); done(''); });
+    skip.addEventListener('click', () => { bubble('me', esc(skipT)); done(''); });
     replies.append(f, skip); scroll();
     if (matchMedia('(hover:hover)').matches) setTimeout(() => f.querySelector('input').focus({ preventScroll: true }), 50);
   });
-  const KINDS = ['Стрітфуд', 'Кав’ярня', 'Кафе', 'Піцерія / суші', 'Ресторан / паб'];
+  const KINDS = ['Стрітфуд', 'Кав’ярня', 'Кафе', 'Піцерія / суші', 'Ресторан / паб', '💡 Своя ідея'];
   const KIND_TXT = [
     'Гарний старт: невелика площа й швидкий запуск. Але тут усе вирішує локація — її порахуємо першою.',
     'У кав’ярні гроші в каві й десертах. Меню зробимо так, щоб гість брав ще щось до чашки.',
     'Кафе — це баланс кухні й залу. Плануємо цех так, щоб на пасі не було черги.',
     'Тут половина успіху — доставка й упаковка. Закладемо їх у меню й кухню з першого дня.',
-    'Великий формат — більше команди й процесів. Я запускав формати Red Cat — від фуд-корту до пивного ресторану.'
+    'Великий формат — більше команди й процесів. Я запускав формати Red Cat — від фуд-корту до пивного ресторану.',
+    'Люблю такі задачі! Індивідуальний формат зберемо під вашу ідею, локацію й гостя — від концепції до меню.'
   ];
   const side = () => mob() ? 'Чек друкується трохи нижче 👇' : 'Дивіться праворуч — чек уже друкується 👉';
   async function start() {
@@ -576,7 +578,14 @@ const CONFIG = {
     const day = document.createElement('div'); day.className = 'msg__day'; day.textContent = 'сьогодні'; feed.appendChild(day);
     await say('Вітаю! Я Дмитро Барсук, бренд-шеф 👨‍🍳', id);
     await say('Порахуймо ваш заклад за хвилину. Що хочете відкрити?', id);
-    const k = await ask(KINDS, id); if (id !== run) return; st.k = KINDS[k]; known.k = 1; push(true);
+    const k = await ask(KINDS, id); if (id !== run) return;
+    st.idea = '';
+    if (k === 5) {
+      await say('Цікаво! Опишіть ідею кількома словами 👇', id);
+      const idea = await askName(id, 'Наприклад: гриль-бар з крафтом', 'Розкажу на зустрічі'); if (id !== run) return;
+      st.idea = idea; st.k = idea ? idea.charAt(0).toUpperCase() + idea.slice(1) : 'Індивідуальний формат';
+    } else st.k = KINDS[k];
+    known.k = 1; push(true);
     await say(KIND_TXT[k], id);
     await say('А як назвете заклад? Напишіть — впишу в чек.', id);
     const nm = await askName(id); if (id !== run) return;
@@ -601,7 +610,7 @@ const CONFIG = {
     if (id !== run) return;
     replies.innerHTML = ''; replies.classList.add('show', 'final');
     const go = document.createElement('button'); go.type = 'button'; go.className = 'go'; go.innerHTML = '<svg class="bell"><use href="#bell"/></svg>Передати чек шефу';
-    go.addEventListener('click', e => { window.__pasSet && window.__pasSet(st.a, st.k, st.p); window.__openModal && window.__openModal(e); const mf = document.getElementById('m-for'); if (mf) { mf.textContent = known.n ? 'для «' + known.n + '»' : ''; mf.classList.toggle('on', !!known.n); } const m = document.getElementById('mf-msg'); if (m && !m.value) m.value = [known.n ? 'Назва: «' + known.n + '»' : '', 'Старт: ' + (known.w || '—')].filter(Boolean).join('. ') + '.'; });
+    go.addEventListener('click', e => { window.__pasSet && window.__pasSet(st.a, st.k, st.p); window.__openModal && window.__openModal(e); if (!['Стрітфуд','Кав’ярня','Кафе','Піцерія / суші','Ресторан / паб'].includes(st.k)) { const fk = document.getElementById('mf-kind'); if (fk) [...fk.options].forEach((o, i) => { if (o.text === 'Інше') fk.selectedIndex = i; }); } const mf = document.getElementById('m-for'); if (mf) { mf.textContent = known.n ? 'для «' + known.n + '»' : ''; mf.classList.toggle('on', !!known.n); } const m = document.getElementById('mf-msg'); if (m && !m.value) m.value = [st.idea ? 'Ідея: ' + st.idea : '', known.n ? 'Назва: «' + known.n + '»' : '', 'Старт: ' + (known.w || '—')].filter(Boolean).join('. ') + '.'; });
     const again = document.createElement('button'); again.type = 'button'; again.textContent = 'Почати спочатку'; again.addEventListener('click', start);
     replies.append(go, again); scroll();
   }
@@ -618,4 +627,23 @@ const CONFIG = {
   const sync = () => { const d = root.classList.contains('theme-dark'); t.setAttribute('aria-label', d ? 'Світла тема' : 'Темна тема'); if (meta) meta.content = d ? '#221E1A' : '#F3EEE5'; };
   sync(); requestAnimationFrame(() => root.classList.add('theme-ready'));
   t.addEventListener('click', () => { root.classList.toggle('theme-dark'); try { localStorage.setItem('pas-theme', root.classList.contains('theme-dark') ? 'dark' : 'light'); } catch (e) {} sync(); });
+})();
+
+/* v13 — rotating venue type in hero H1 */
+(() => {
+  const em = document.getElementById('rot'); if (!em) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const W = ['ваш заклад', 'кав’ярню', 'піцерію', 'бургерну', 'пекарню', 'суші-бар', 'паб', 'ресторан', 'шаурму'];
+  let i = 0, busy = false;
+  const tick = () => {
+    if (busy || document.hidden || typeof gsap === 'undefined') return;
+    const cur = em.querySelector('.w'); if (!cur) return;
+    busy = true; i = (i + 1) % W.length;
+    const n = document.createElement('span'); n.className = 'w rot__n'; n.innerHTML = '<span></span>'; n.firstChild.textContent = W[i];
+    em.appendChild(n);
+    gsap.set(n.firstChild, { yPercent: 110 });
+    gsap.to(cur.firstChild, { yPercent: -110, duration: .55, ease: 'power3.in' });
+    gsap.to(n.firstChild, { yPercent: 0, duration: .75, ease: 'power3.out', delay: .35, onComplete: () => { cur.remove(); n.classList.remove('rot__n'); busy = false; } });
+  };
+  setTimeout(() => { em.innerHTML = '<span class="w"><span></span></span>'; em.querySelector('.w>span').textContent = W[0]; setInterval(tick, 2100); }, 2600);
 })();

@@ -724,3 +724,10 @@ html.theme-dark .pre{background:#221E1A}
 html.theme-dark .loss__x span{background-image:linear-gradient(#E0502F,#E0502F)}
 html.theme-dark .theme-t{color:inherit}
 html.theme-ready body,html.theme-ready .hdr__bg,html.theme-ready .sec{transition:background-color .5s var(--ease),color .5s var(--ease)}
+/* v13 — rotating word */
+.hero h1 .rot{position:relative;display:inline-block;white-space:nowrap}
+.hero h1 .rot .w.rot__n{position:absolute;left:0;top:0}
+.hero h1{max-width:none}
+@media(min-width:861px){.hero h1{max-width:8.2em}}
+.hero h1 .nw{white-space:nowrap}
+@media(max-width:860px) and (max-height:720px){.hero__ring{display:none}}
