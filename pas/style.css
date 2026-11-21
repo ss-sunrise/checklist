@@ -662,3 +662,4 @@ body.chat-on .fab{transform:translateY(160%)!important}
 .chatsec__copy .lead{margin-top:30px}
 .chatsec__copy h2{font-size:clamp(38px,4.4vw,68px)}
 .cbill__stamp{top:68px;right:10px}
+.cbill__stamp{top:auto;bottom:46px;right:auto;left:12px}
