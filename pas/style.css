@@ -774,3 +774,8 @@ html.theme-ready body,html.theme-ready .hdr__bg,html.theme-ready .sec{transition
   .proj__head h2{font-size:clamp(30px,6vh,56px)}
   .proj__head{margin-bottom:20px}
 }
+/* v18 centered stats */
+.stats--d{margin-bottom:clamp(20px,3vw,40px)}
+.stats--d .stat{text-align:center;padding:34px 12px 18px}
+.stats--d .stat+.stat{padding-left:12px}
+.stats--d .stat>span{margin-left:auto;margin-right:auto;max-width:22ch}
