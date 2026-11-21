@@ -98,7 +98,7 @@ const CONFIG = {
     if (reduce) return;
     const tl = gsap.timeline();
     tl.to(h1Words, { yPercent: 0, duration: 1.2, ease: 'power4.out', stagger: 0.06 })
-      .from('.hero .label, .hero__p, .hero__cta, .hero__meta', { opacity: 0, y: 24, duration: 1, ease: 'power3.out', stagger: 0.08 }, 0.25)
+      .from('.hero .label, .hero__p, .hero__cta, .hero__meta, .hero__facts', { opacity: 0, y: 24, duration: 1, ease: 'power3.out', stagger: 0.08 }, 0.25)
       .fromTo('#heroMedia', { '--k': 0 }, { '--k': 1, duration: 1.5, ease: 'expo.out' }, 0.1)
       .from('.hero__ring', { opacity: 0, rotate: -40, scale: .8, duration: 1.6, ease: 'expo.out' }, 0.3)
       .from('.hero__badge', { opacity: 0, y: 30, duration: 1, ease: 'power3.out' }, 0.8)
@@ -124,7 +124,7 @@ const CONFIG = {
   function heroGeo() {
     const w = innerWidth, h = Math.max(innerHeight, 640);
     if (isMob()) {
-      const ph = pin.offsetHeight || h, cta = $('.hero__cta'), r = Math.min(w * 0.42, 190);
+      const ph = pin.offsetHeight || h, cta = $('.hero__facts') || $('.hero__cta'), r = Math.min(w * 0.42, 190);
       const cb = cta.offsetTop + cta.offsetHeight + $('.hero__copy').offsetTop;
       let cy = cb + r + 48; if (ph - (cy - r) < 150) cy = ph - 150 + r;
       return { x: 50, y: cy / ph * 100, r };
@@ -277,9 +277,10 @@ const CONFIG = {
   function flip(i, dir, from) {
     const l = lv[i]; if (!l) return; const o = { r: from !== undefined ? from : (dir > 0 ? 0 : -180) };
     if (single && dir < 0) gsap.set(l, { opacity: 1 });
+    l.style.pointerEvents = 'none';
     gsap.set(l, { zIndex: 300 + i });
     gsap.to(o, { r: dir > 0 ? -180 : 0, duration: reduce ? 0 : (i === 0 ? 1.1 : .9), ease: 'power2.inOut', onUpdate: () => setR(l, o.r),
-      onComplete: () => { gsap.set(l, { zIndex: dir > 0 ? 100 + i : lv.length - i }); if (single && dir > 0) gsap.to(l, { opacity: 0, duration: .25 }); } });
+      onComplete: () => { gsap.set(l, { zIndex: dir > 0 ? 100 + i : lv.length - i }); if (single && dir > 0) gsap.to(l, { opacity: 0, duration: .25 }); l.style.pointerEvents = (single && dir > 0) ? 'none' : ''; } });
   }
   const bNext = () => { if (bidx >= lv.length) return; if (bidx === 0) setOpen(true); flip(bidx, 1); bidx++; bupNav(); $('#bkHint').style.opacity = 0; };
   const bPrev = () => { if (bidx <= 0) return; bidx--; flip(bidx, -1); if (bidx === 0) setTimeout(() => setOpen(false), 350); bupNav(); };
@@ -488,4 +489,13 @@ const CONFIG = {
   let rw = innerWidth;
   addEventListener('resize', () => { if (Math.abs(innerWidth - rw) < 2) return; rw = innerWidth; buildHero(); ScrollTrigger.sort(); ScrollTrigger.refresh(); });
   addEventListener('load', () => ScrollTrigger.refresh());
+})();
+
+/* v6 — losses strike on scroll */
+(() => {
+  const items = document.querySelectorAll('#loss li');
+  if (!items.length) return;
+  if (!('IntersectionObserver' in window)) { items.forEach(i => i.classList.add('in')); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -30% 0px' });
+  items.forEach(i => io.observe(i));
 })();
