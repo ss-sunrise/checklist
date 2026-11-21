@@ -185,6 +185,35 @@ const CONFIG = {
     ScrollTrigger.create({ trigger: '.rail', start: 'top bottom', end: 'bottom top', onUpdate: s => { rot(gsap.utils.clamp(-9, 9, -s.getVelocity() / 260)); clearTimeout(rail._t); rail._t = setTimeout(() => rot(0), 90); } });
   }
 
+  /* ---------- tear-off format tickets ---------- */
+  const KIND = { 'Шаурма': 'Стрітфуд', 'Бургерна': 'Стрітфуд', 'Чебуречна': 'Стрітфуд', 'Крепи': 'Стрітфуд', 'Кав’ярня': 'Кав’ярня', 'Кафе при ЖК': 'Кафе', 'Піцерія': 'Піцерія / суші', 'Суші': 'Піцерія / суші', 'Паб': 'Ресторан / паб', 'Ресторан': 'Ресторан / паб' };
+  const hint = document.createElement('p'); hint.className = 'rail__hint'; hint.innerHTML = '<span>↓</span> Зірвіть тікет свого формату — і заявка готова'; $('.rail').appendChild(hint);
+  let tearing = false;
+  function tear(tk, ev) {
+    if (tearing || tk.classList.contains('tk--torn')) return; tearing = true;
+    const name = tk.querySelector('b').textContent, no = tk.querySelector('span').textContent.replace('ТІКЕТ ', '');
+    const r = tk.getBoundingClientRect(), c = tk.cloneNode(true);
+    Object.assign(c.style, { position: 'fixed', left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', margin: '0', zIndex: 1500, pointerEvents: 'none', animation: 'none' });
+    c.classList.add('tk--fly'); document.body.appendChild(c); tk.classList.add('tk--torn');
+    if (reduce) c.remove(); else gsap.timeline({ onComplete: () => c.remove() })
+      .to(c, { rotation: gsap.utils.random(-9, 9), y: -6, duration: .12, ease: 'power1.out' })
+      .to(c, { y: 70, rotation: gsap.utils.random(-22, 22), duration: .5, opacity: 0, ease: 'power2.in' });
+    if (window.__pasSet) { const k = KIND[name] || 'Інше'; window.__pasSet(window.__pasSt ? window.__pasSt.a : 1, k, window.__pasSt ? window.__pasSt.p : 'вже є'); }
+    setTimeout(() => {
+      window.__openModal && window.__openModal({ clientX: r.left + r.width / 2, clientY: r.top + r.height });
+      const fk = document.getElementById('mf-kind'); const k = KIND[name] || 'Інше';
+      if (fk) [...fk.options].forEach((o, i) => { if (o.text === k) fk.selectedIndex = i; });
+      const mk = document.getElementById('m-kind'); if (mk) mk.textContent = name;
+      const m = document.getElementById('mf-msg'); if (m) m.value = 'Формат: ' + name + ' (тікет ' + no + ').';
+    }, reduce ? 0 : 420);
+    setTimeout(() => { tk.classList.remove('tk--torn'); tearing = false; }, 3200);
+  }
+  let drag = null;
+  rail.addEventListener('pointerdown', e => { const tk = e.target.closest('.tk'); if (tk && e.pointerType !== 'touch') drag = { tk, y: e.clientY, x: e.clientX, done: false }; });
+  window.addEventListener('pointermove', e => { if (drag && !drag.done && e.clientY - drag.y > 28) { drag.done = true; tear(drag.tk, e); } });
+  window.addEventListener('pointerup', () => { setTimeout(() => { drag = null; }, 0); });
+  rail.addEventListener('click', e => { const tk = e.target.closest('.tk'); if (!tk || (drag && drag.done)) return; tear(tk, e); });
+
   /* ---------- chef parallax ---------- */
   if (!reduce) {
     $$('[data-par]').forEach(img => gsap.fromTo(img, { yPercent: -8 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: img.closest('section'), start: 'top bottom', end: 'bottom top', scrub: true } }));

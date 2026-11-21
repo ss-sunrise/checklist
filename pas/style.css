@@ -779,3 +779,13 @@ html.theme-ready body,html.theme-ready .hdr__bg,html.theme-ready .sec{transition
 .stats--d .stat{text-align:center;padding:34px 12px 18px}
 .stats--d .stat+.stat{padding-left:12px}
 .stats--d .stat>span{margin-left:auto;margin-right:auto;max-width:22ch}
+
+/* v19 tear-off tickets */
+.tk{cursor:grab;user-select:none;-webkit-user-select:none;transition:opacity .3s}
+.tk:hover{box-shadow:0 18px 28px -16px rgba(0,0,0,.5)}
+.tk--torn{opacity:.18;pointer-events:none}
+.tk--torn b::after{content:"";}
+.tk--fly{box-shadow:0 24px 40px -14px rgba(0,0,0,.5)}
+.rail__hint{position:relative;text-align:center;margin-top:22px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rail__hint span{display:inline-block;color:var(--red);margin-right:6px;animation:hintdown 1.4s ease-in-out infinite}
+@keyframes hintdown{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
