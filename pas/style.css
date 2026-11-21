@@ -663,3 +663,17 @@ body.chat-on .fab{transform:translateY(160%)!important}
 .chatsec__copy h2{font-size:clamp(38px,4.4vw,68px)}
 .cbill__stamp{top:68px;right:10px}
 .cbill__stamp{top:auto;bottom:46px;right:auto;left:12px}
+
+/* v9 — calc = chat + printer */
+.calc--chat{grid-template-columns:minmax(0,390px) minmax(0,460px);justify-content:center;align-items:center;gap:clamp(36px,6vw,110px);position:relative;z-index:1}
+.calc--chat .phone{margin:0}
+.calc--chat .printer{align-self:center}
+#vartist .sec-head{position:relative;z-index:1}
+@media(max-width:860px){.calc--chat{grid-template-columns:1fr}.calc--chat .phone{margin:0 auto}
+  body.chat-on .mini{top:12px;bottom:auto}
+  body.chat-on .mini.show{transform:none}
+  body.chat-on .mini:not(.show){transform:translateY(-160%)}
+}
+.bill__stamp{top:18px;right:16px;opacity:0;transform:rotate(-24deg) scale(2.2);transition:opacity .25s,transform .45s cubic-bezier(.3,1.7,.5,1)}
+.bill.done .bill__stamp{opacity:.9;transform:rotate(-10deg) scale(1)}
+@media(max-width:860px){.bill__stamp{top:14px;right:10px;font-size:10.5px}}

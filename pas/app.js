@@ -328,7 +328,7 @@ const CONFIG = {
   const st8 = { a: 0, k: 'Стрітфуд', p: 'вже є' };
   const bill = $('#bill'), bp = $('#b-price');
   const mask = document.createElement('div'); mask.style.cssText = 'overflow:hidden;padding:0 0 14px;margin-top:-9px'; bill.parentNode.insertBefore(mask, bill); mask.appendChild(bill); bill.style.margin = '0 auto';
-  let shown = PRICE[0];
+  let shown = PRICE[0], priceTw = null;
   const mini = $('#mini');
   const fmt$ = v => '$' + String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   let prev = { a: 0, k: 'Стрітфуд', p: 'вже є' };
@@ -339,7 +339,7 @@ const CONFIG = {
     $('#mi-sum').textContent = AREA[st8.a] + ' · ' + st8.k;
     $('#b-area').textContent = AREA[st8.a]; $('#b-kind').textContent = st8.k; $('#b-place').textContent = st8.p; $('#b-inv').textContent = INV[st8.a];
     const no = String(1000 + Math.floor(Math.random() * 8999)); $('#bno').textContent = no; $('#mi-no').textContent = no;
-    const o = { v: shown }; gsap.to(o, { v: PRICE[st8.a], duration: .8, ease: 'power2.out', onUpdate: () => { bp.textContent = fmt$(o.v); $('#mi-price').textContent = fmt$(o.v); } }); shown = PRICE[st8.a];
+    const o = { v: shown }; priceTw && priceTw.kill(); priceTw = gsap.to(o, { v: PRICE[st8.a], duration: .8, ease: 'power2.out', onUpdate: () => { bp.textContent = fmt$(o.v); $('#mi-price').textContent = fmt$(o.v); } }); shown = PRICE[st8.a];
     if (print && !reduce && mini.classList.contains('show')) { gsap.fromTo(mini, { y: -14, rotation: gsap.utils.random(-2.5, 2.5) }, { y: 0, rotation: 0, duration: 1, ease: 'elastic.out(1,0.35)' }); gsap.fromTo('#mi-price', { color: '#E9A94B' }, { color: '#C93A20', duration: .8 }); }
     if (print && !reduce) gsap.fromTo(bill, { yPercent: -100 }, { yPercent: 0, duration: 1.1, ease: 'steps(9)' });
   }
@@ -358,8 +358,8 @@ const CONFIG = {
   /* ---------- mini live ticket (mobile) ---------- */
   let inCalc = false, billVis = false;
   const upMini = () => { const on = inCalc && !billVis; mini.classList.toggle('show', on); document.body.classList.toggle('mini-on', on); };
-  new IntersectionObserver(es => es.forEach(e => { inCalc = e.isIntersecting; upMini(); }), { rootMargin: '-25% 0px -25% 0px' }).observe($('.calc__f'));
-  new IntersectionObserver(es => es.forEach(e => { billVis = e.isIntersecting; upMini(); }), { threshold: .45 }).observe($('.printer'));
+  new IntersectionObserver(es => es.forEach(e => { inCalc = e.isIntersecting; upMini(); }), { rootMargin: '-25% 0px -25% 0px' }).observe($('.calc__f') || $('.phone'));
+  new IntersectionObserver(es => es.forEach(e => { billVis = e.isIntersecting; upMini(); }), { threshold: .2 }).observe($('.printer'));
   $('#mi-go').addEventListener('click', e => openModal(e));
   $('#mini').addEventListener('click', e => { if (e.target.closest('#mi-go')) return; go('.printer'); });
 
@@ -412,6 +412,17 @@ const CONFIG = {
   }
   window.__openModal = openModal;
   window.__pasSet = (a, k, p) => { st8.a = a; st8.k = k; st8.p = p; syncCalcButtons(); render(false); };
+  window.__pasChat = (st, known, print) => {
+    st8.a = st.a; st8.k = st.k; st8.p = st.p; render(print);
+    const dash = '—';
+    if (!known.k) { $('#b-kind').textContent = dash; }
+    if (!known.a) { $('#b-area').textContent = known.aSkip ? 'уточнимо' : dash; $('#b-inv').textContent = known.aSkip ? 'залежить від площі' : dash; }
+    if (!known.a && !known.aSkip) { priceTw && priceTw.kill(); bp.textContent = '$ —'; $('#mi-price').textContent = '$ —'; shown = PRICE[0]; }
+    if (known.aSkip) { priceTw && priceTw.kill(); bp.textContent = 'від ' + fmt$(PRICE[0]); $('#mi-price').textContent = 'від ' + fmt$(PRICE[0]); }
+    if (!known.p) $('#b-place').textContent = dash;
+    $('#b-when').textContent = known.w || dash;
+    $('#mi-sum').textContent = [known.k ? st.k : '', known.a ? AREA[st.a] : ''].filter(Boolean).join(' · ') || 'Відповідайте шефу';
+  };
   $$('[data-close]', modal).forEach(b => b.addEventListener('click', closeModal));
   addEventListener('keydown', e => {
     if (!isOpen) return;
@@ -501,22 +512,22 @@ const CONFIG = {
   items.forEach(i => io.observe(i));
 })();
 
-/* v8 — chat with chef (quiz + bill) */
+/* v9 — chat with chef drives the bill in the printer */
 (() => {
   const feed = document.getElementById('chatFeed'), replies = document.getElementById('chatReplies'), status = document.getElementById('chatStatus');
   if (!feed) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const PRICE = [2800, 3300, 3600, 4800];
-  const INV = ['$10 000 – 18 000', '$15 000 – 25 000', '$20 000 – 40 000', '$35 000 – 65 000'];
+  const mob = () => innerWidth <= 860;
   const AREA = ['до 20 м²', '20–40 м²', '40–60 м²', '60–80 м²'];
-  const fmt$ = v => '$' + String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   const now = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
   const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
   let run = 0;
-  const st = { k: 'Стрітфуд', a: 0, aKnown: true, p: 'вже є', when: '' };
+  const st = { k: 'Стрітфуд', a: 0, p: 'вже є' };
+  let known = {};
+  const push = print => window.__pasChat && window.__pasChat(st, known, print);
   const scroll = () => feed.scrollTo({ top: feed.scrollHeight, behavior: reduce ? 'auto' : 'smooth' });
-  const bubble = (who, html, cls = '') => {
-    const b = document.createElement('div'); b.className = `msg msg--${who} ${cls}`;
+  const bubble = (who, html) => {
+    const b = document.createElement('div'); b.className = `msg msg--${who}`;
     b.innerHTML = `<div class="msg__b">${html}<span class="msg__t">${now()}${who === 'me' ? ' <i>✓✓</i>' : ''}</span></div>`;
     feed.appendChild(b); requestAnimationFrame(() => b.classList.add('in')); scroll(); return b;
   };
@@ -525,15 +536,15 @@ const CONFIG = {
     status.textContent = 'друкує…'; status.classList.add('typing');
     const t = document.createElement('div'); t.className = 'msg msg--chef in'; t.innerHTML = '<div class="msg__b typing"><i></i><i></i><i></i></div>';
     feed.appendChild(t); scroll();
-    await wait(Math.min(1500, 500 + text.length * 14));
+    await wait(Math.min(1200, 450 + text.length * 11));
     t.remove(); if (id !== run) return;
     status.textContent = 'онлайн'; status.classList.remove('typing');
-    bubble('chef', text); await wait(350);
+    bubble('chef', text); await wait(250);
   }
   const ask = (opts, id) => new Promise(res => {
     if (id !== run) return;
     replies.innerHTML = ''; replies.classList.add('show');
-    opts.forEach((o, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.style.transitionDelay = (i * 50) + 'ms'; b.addEventListener('click', () => { replies.classList.remove('show'); replies.innerHTML = ''; bubble('me', o); res(i); }); replies.appendChild(b); });
+    opts.forEach((o, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.addEventListener('click', () => { replies.classList.remove('show'); replies.innerHTML = ''; bubble('me', o); res(i); }); replies.appendChild(b); });
     scroll();
   });
   const KINDS = ['Стрітфуд', 'Кав’ярня', 'Кафе', 'Піцерія / суші', 'Ресторан / паб'];
@@ -544,35 +555,32 @@ const CONFIG = {
     'Тут половина успіху — доставка й упаковка. Закладемо їх у меню й кухню з першого дня.',
     'Великий формат — більше команди й процесів. Я запускав формати Red Cat — від фуд-корту до пивного ресторану.'
   ];
+  const side = () => mob() ? 'Чек друкується трохи нижче 👇' : 'Дивіться праворуч — чек уже друкується 👉';
   async function start() {
     const id = ++run; feed.innerHTML = ''; replies.innerHTML = ''; replies.className = 'phone__replies'; status.textContent = 'онлайн';
+    known = {}; push(false); document.getElementById('bill').classList.remove('done');
     const day = document.createElement('div'); day.className = 'msg__day'; day.textContent = 'сьогодні'; feed.appendChild(day);
     await say('Вітаю! Я Дмитро Барсук, бренд-шеф 👨‍🍳', id);
-    await say('Давайте за хвилину прикинемо ваш заклад. Що хочете відкрити?', id);
-    const k = await ask(KINDS, id); if (id !== run) return; st.k = KINDS[k];
+    await say('Порахуймо ваш заклад за хвилину. Що хочете відкрити?', id);
+    const k = await ask(KINDS, id); if (id !== run) return; st.k = KINDS[k]; known.k = 1; push(true);
     await say(KIND_TXT[k], id);
+    await say(side(), id);
     await say('Яка площа приміщення?', id);
     const a = await ask([...AREA, 'Ще не знаю'], id); if (id !== run) return;
-    st.aKnown = a < 4; st.a = a < 4 ? a : 0;
-    await say(st.aKnown ? 'Зрозумів. Під цю площу вже можу назвати порядок цифр.' : 'Нормально, з цього багато хто починає. Порахую від мінімальної площі — далі уточнимо.', id);
+    if (a < 4) { st.a = a; known.a = 1; } else { st.a = 0; known.aSkip = 1; }
+    push(true);
+    await say(a < 4 ? 'Під цю площу вже бачу порядок цифр — у чеку вартість послуг і середні інвестиції.' : 'Нормально, з цього багато хто починає. Площу підберемо під формат — у чеку поки мінімальна вартість.', id);
     await say('Приміщення вже є?', id);
     const p = await ask(['Так, вже є', 'Ні, треба знайти'], id); if (id !== run) return;
-    st.p = p === 0 ? 'вже є' : 'треба знайти';
-    await say(p === 0 ? 'Супер. Тоді почнемо з аналізу локації й аудиторії — щоб формат точно окупився саме там.' : 'Допоможу знайти й прорахувати. Головне — не підписувати оренду, поки не зрозуміло, що там відкривати.', id);
+    st.p = p === 0 ? 'вже є' : 'треба знайти'; known.p = 1; push(true);
+    await say(p === 0 ? 'Супер. Почнемо з аналізу локації й аудиторії — щоб формат точно окупився саме там.' : 'Допоможу знайти й прорахувати. Головне — не підписувати оренду, поки не зрозуміло, що там відкривати.', id);
     await say('І останнє: коли хочете відкритися?', id);
-    const w = await ask(['Якнайшвидше', 'За 2–3 місяці', 'Поки думаю'], id); if (id !== run) return;
+    const WHEN = ['Якнайшвидше', 'За 2–3 місяці', 'Поки думаю'];
+    const w = await ask(WHEN, id); if (id !== run) return;
+    known.w = ['якнайшвидше', 'за 2–3 міс', 'поки думаю'][w]; push(true);
     await say(w === 2 ? 'Чесно: так і варто — спершу цифри, потім рішення. Перша розмова ні до чого не зобов’язує.' : 'Реально: 1,5–3 місяці від договору до першої зміни. Терміни фіксуємо в договорі.', id);
-    await say('Тримайте попередній чек 👇', id);
-    if (id !== run) return;
-    const inv = st.aKnown ? INV[st.a] : 'залежить від площі';
-    const price = st.aKnown ? fmt$(PRICE[st.a]) : 'від ' + fmt$(PRICE[0]);
-    const no = String(1000 + Math.floor(Math.random() * 8999));
-    const b = bubble('chef', `<div class="cbill"><div class="cbill__h"><b>ПАС</b>ЧЕК № ${no} · попередній</div><div class="cbill__stamp">ПІД КЛЮЧ</div>
-      <p><span>Формат</span><span>${st.k}</span></p><p><span>Площа</span><span>${st.aKnown ? AREA[st.a] : 'уточнимо'}</span></p><p><span>Приміщення</span><span>${st.p}</span></p>
-      <p><span>Термін</span><span>1,5–3 міс</span></p><p><span>Супровід</span><span>1 міс після відкриття</span></p><p><span>Інвестиції</span><span>${inv}</span></p>
-      <p class="big"><span>Послуги «Пас»</span><b>${price}</b></p></div>`, 'msg--bill');
-    await wait(1300);
-    await say('Залиште номер — зателефоную й порахую точно під вашу локацію.', id);
+    document.getElementById('bill').classList.add('done');
+    await say('Чек готовий ✅ Залиште номер — зателефоную й порахую точно під вашу локацію.', id);
     if (id !== run) return;
     replies.innerHTML = ''; replies.classList.add('show', 'final');
     const go = document.createElement('button'); go.type = 'button'; go.className = 'go'; go.innerHTML = '<svg class="bell"><use href="#bell"/></svg>Передати чек шефу';
@@ -581,6 +589,7 @@ const CONFIG = {
     replies.append(go, again); scroll();
   }
   document.getElementById('chatRestart').addEventListener('click', start);
+  push(false);
   let started = false;
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !started) { started = true; start(); io.disconnect(); } }), { threshold: .35 });
   io.observe(document.querySelector('.phone'));

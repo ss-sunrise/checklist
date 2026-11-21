@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/golos.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="img/d-duck-m.webp" media="(max-width:860px)">
 <link rel="preload" as="image" href="img/d-duck.webp" media="(min-width:861px)">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=12">
 <script>document.documentElement.classList.replace('no-js','js');if(sessionStorage.getItem('pas-pre')||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('no-pre');</script>
 </head>
 <body>
@@ -66,7 +66,7 @@
       <p class="hero__p"><b>Без франшизи й роялті.</b> Шеф сам пише меню, ставить кухню й навчає команду — від бізнес-плану й приміщення до першої зміни. Заклад і бренд — ваші.</p>
       <div class="hero__cta">
         <a href="#vartist" class="btn btn--red mag"><svg class="bell"><use href="#bell"/></svg>Розрахувати мій заклад</a>
-        <a href="#chat" class="btn btn--ghost mag btn--chat"><i class="dot"></i>Написати шефу</a>
+        <a href="#vartist" class="btn btn--ghost mag btn--chat"><i class="dot"></i>Написати шефу</a>
       </div>
       <div class="hero__facts"><span><b>від $2 800</b>під ключ</span><span><b>0%</b>роялті</span><span><b>20+</b>закладів</span><span><b>1 міс</b>супроводу</span></div>
     </div>
@@ -310,29 +310,33 @@
 
 <!-- CALC -->
 <section class="sec dark glow" id="vartist">
-  <div class="wrap calc">
-    <div class="calc__f">
-      <span class="label">Вартість без сюрпризів</span>
-      <h2 data-split>Порахуйте заклад <em>за 10 секунд</em></h2>
-      <p class="lead" data-r>Оберіть площу — чек одразу покаже вартість наших послуг під ключ і середні інвестиції у відкриття.</p>
-      <div class="grp" data-r><span class="mono">Площа закладу</span>
-        <div class="seg" id="area"><button class="on" data-i="0">до 20 м²</button><button data-i="1">20–40 м²</button><button data-i="2">40–60 м²</button><button data-i="3">60–80 м²</button></div>
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="label">Вартість без сюрпризів</span><h2 style="margin-top:20px" data-split>Порахуйте заклад <em>разом із шефом</em></h2></div>
+      <p class="lead" data-r>Дмитро поставить чотири питання, як на першій зустрічі. З кожною відповіддю поруч друкується чек: вартість послуг під ключ і середні інвестиції у відкриття.</p>
+    </div>
+  </div>
+  <div class="wrap calc calc--chat">
+    <div class="phone" data-r>
+      <div class="phone__notch"></div>
+      <div class="phone__top">
+        <span class="phone__back">‹</span>
+        <img src="img/chef-m.webp" alt="" class="phone__ava" loading="lazy" decoding="async">
+        <div class="phone__who"><b>Дмитро Барсук</b><span id="chatStatus">онлайн</span></div>
+        <button class="phone__re" id="chatRestart" aria-label="Почати спочатку" title="Почати спочатку">↻</button>
       </div>
-      <div class="grp" data-r><span class="mono">Формат</span>
-        <div class="seg" id="kind"><button class="on">Стрітфуд</button><button>Кав’ярня</button><button>Кафе</button><button>Піцерія / суші</button><button>Ресторан / паб</button></div>
-      </div>
-      <div class="grp" data-r><span class="mono">Приміщення</span>
-        <div class="seg" id="place"><button class="on">Вже є</button><button>Треба знайти</button></div>
-      </div>
+      <div class="phone__feed" id="chatFeed" data-lenis-prevent aria-live="polite"></div>
+      <div class="phone__replies" id="chatReplies"></div>
     </div>
     <div class="printer" data-r>
       <div class="printer__slot"></div>
       <div class="bill" id="bill">
         <div class="bill__h"><b>ПАС</b>ЧЕК № <span id="bno">0412</span> · попередній</div>
         <div class="bill__stamp">ПІД КЛЮЧ</div>
-        <p><span>Площа</span><span id="b-area">до 20 м²</span></p>
         <p><span>Формат</span><span id="b-kind">Стрітфуд</span></p>
+        <p><span>Площа</span><span id="b-area">до 20 м²</span></p>
         <p><span>Приміщення</span><span id="b-place">вже є</span></p>
+        <p><span>Старт</span><span id="b-when">—</span></p>
         <p><span>Термін</span><span>1,5–3 міс</span></p>
         <p><span>Супровід</span><span>1 міс після відкриття</span></p>
         <p><span>Інвестиції у відкриття</span><span id="b-inv">$10 000 – 18 000</span></p>
@@ -392,32 +396,6 @@
 </section>
 
 
-<!-- CHAT WITH CHEF -->
-<section class="sec dark glow" id="chat">
-  <div class="wrap chatsec">
-    <div class="chatsec__copy">
-      <span class="label">Напишіть шефу</span>
-      <h2 style="margin-top:20px" data-split>Хвилина листування — <em>і чек від Дмитра у вас</em></h2>
-      <p class="lead" data-r>Без анкет і менеджерів. Дмитро сам питає те, що спитав би на першій зустрічі, і одразу надсилає попередній чек вашого закладу.</p>
-      <ul class="chatsec__pts" data-r>
-        <li><span>01</span>Відповідайте кнопками — писати нічого не треба</li>
-        <li><span>02</span>Шеф коментує кожну відповідь, як на живій розмові</li>
-        <li><span>03</span>У кінці — чек із вартістю й інвестиціями, який можна передати шефу</li>
-      </ul>
-    </div>
-    <div class="phone" data-r>
-      <div class="phone__notch"></div>
-      <div class="phone__top">
-        <span class="phone__back">‹</span>
-        <img src="img/chef-m.webp" alt="" class="phone__ava" loading="lazy" decoding="async">
-        <div class="phone__who"><b>Дмитро Барсук</b><span id="chatStatus">онлайн</span></div>
-        <button class="phone__re" id="chatRestart" aria-label="Почати спочатку" title="Почати спочатку">↻</button>
-      </div>
-      <div class="phone__feed" id="chatFeed" data-lenis-prevent aria-live="polite"></div>
-      <div class="phone__replies" id="chatReplies"></div>
-    </div>
-  </div>
-</section>
 
 <!-- FAQ -->
 <section class="sec" id="pytannia" style="padding-top:0">
@@ -520,11 +498,11 @@
   <button class="mini__go" id="mi-go" aria-label="Передати чек шефу"><svg><use href="#bell"/></svg></button>
 </div>
 
-<a href="#chat" class="fab" id="fab"><svg class="bell"><use href="#bell"/></svg>Обговорити заклад</a>
+<a href="#vartist" class="fab" id="fab"><svg class="bell"><use href="#bell"/></svg>Обговорити заклад</a>
 
 <script src="js/gsap.min.js" defer></script>
 <script src="js/ScrollTrigger.min.js" defer></script>
 <script src="js/lenis.min.js" defer></script>
-<script src="app.js?v=9" defer></script>
+<script src="app.js?v=12" defer></script>
 </body>
 </html>
