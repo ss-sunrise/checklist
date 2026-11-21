@@ -677,3 +677,11 @@ body.chat-on .fab{transform:translateY(160%)!important}
 .bill__stamp{top:18px;right:16px;opacity:0;transform:rotate(-24deg) scale(2.2);transition:opacity .25s,transform .45s cubic-bezier(.3,1.7,.5,1)}
 .bill.done .bill__stamp{opacity:.9;transform:rotate(-10deg) scale(1)}
 @media(max-width:860px){.bill__stamp{top:14px;right:10px;font-size:10.5px}}
+.bill__for{display:block;margin-top:6px;font-family:var(--serif);font-style:italic;font-size:19px;letter-spacing:0;color:var(--red);min-height:0;opacity:0;transform:translateY(-4px);transition:opacity .4s,transform .4s}
+.bill__for.on{opacity:1;transform:none}
+.phone__replies.inp{flex-direction:column;align-items:stretch}
+.phone__inp{display:flex;gap:6px}
+.phone__inp input{flex:1;min-width:0;height:42px;border-radius:21px;border:1.5px solid var(--red);padding:0 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink);outline:none}
+.phone__inp button{width:42px;height:42px;border-radius:50%;background:var(--red)!important;color:#fff!important;box-shadow:none!important;padding:0!important;font-size:15px}
+.phone__replies .skip{align-self:flex-end;box-shadow:none!important;padding:4px 6px!important;font-size:12.5px!important;color:var(--muted)!important;background:none!important;text-decoration:underline;text-underline-offset:3px}
+.mbill__h .bill__for{font-size:16px;margin-top:4px}

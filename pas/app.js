@@ -421,7 +421,8 @@ const CONFIG = {
     if (known.aSkip) { priceTw && priceTw.kill(); bp.textContent = 'від ' + fmt$(PRICE[0]); $('#mi-price').textContent = 'від ' + fmt$(PRICE[0]); }
     if (!known.p) $('#b-place').textContent = dash;
     $('#b-when').textContent = known.w || dash;
-    $('#mi-sum').textContent = [known.k ? st.k : '', known.a ? AREA[st.a] : ''].filter(Boolean).join(' · ') || 'Відповідайте шефу';
+    const bf = $('#b-for'); bf.textContent = known.n ? 'для «' + known.n + '»' : ''; bf.classList.toggle('on', !!known.n);
+    $('#mi-sum').textContent = [known.n ? '«' + known.n + '»' : (known.k ? st.k : ''), known.a ? AREA[st.a] : ''].filter(Boolean).join(' · ') || 'Відповідайте шефу';
   };
   $$('[data-close]', modal).forEach(b => b.addEventListener('click', closeModal));
   addEventListener('keydown', e => {
@@ -536,16 +537,29 @@ const CONFIG = {
     status.textContent = 'друкує…'; status.classList.add('typing');
     const t = document.createElement('div'); t.className = 'msg msg--chef in'; t.innerHTML = '<div class="msg__b typing"><i></i><i></i><i></i></div>';
     feed.appendChild(t); scroll();
-    await wait(Math.min(1200, 450 + text.length * 11));
+    await wait(Math.min(950, 380 + text.length * 8));
     t.remove(); if (id !== run) return;
     status.textContent = 'онлайн'; status.classList.remove('typing');
-    bubble('chef', text); await wait(250);
+    bubble('chef', text); await wait(180);
   }
   const ask = (opts, id) => new Promise(res => {
     if (id !== run) return;
     replies.innerHTML = ''; replies.classList.add('show');
     opts.forEach((o, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.addEventListener('click', () => { replies.classList.remove('show'); replies.innerHTML = ''; bubble('me', o); res(i); }); replies.appendChild(b); });
     scroll();
+  });
+  const esc = t => t.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const askName = id => new Promise(res => {
+    if (id !== run) return;
+    replies.innerHTML = ''; replies.classList.add('show', 'inp');
+    const f = document.createElement('form'); f.className = 'phone__inp';
+    f.innerHTML = '<input type="text" maxlength="28" placeholder="Назва закладу" aria-label="Назва закладу" autocomplete="off"><button type="submit" aria-label="Надіслати">➤</button>';
+    const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'skip'; skip.textContent = 'Ще не придумав(-ла)';
+    const done = v => { replies.classList.remove('show', 'inp'); replies.innerHTML = ''; res(v); };
+    f.addEventListener('submit', e => { e.preventDefault(); const v = f.querySelector('input').value.trim().replace(/\s+/g, ' '); if (!v) { f.querySelector('input').focus(); return; } bubble('me', esc(v)); done(v); });
+    skip.addEventListener('click', () => { bubble('me', 'Ще не придумав(-ла)'); done(''); });
+    replies.append(f, skip); scroll();
+    if (matchMedia('(hover:hover)').matches) setTimeout(() => f.querySelector('input').focus({ preventScroll: true }), 50);
   });
   const KINDS = ['Стрітфуд', 'Кав’ярня', 'Кафе', 'Піцерія / суші', 'Ресторан / паб'];
   const KIND_TXT = [
@@ -564,7 +578,10 @@ const CONFIG = {
     await say('Порахуймо ваш заклад за хвилину. Що хочете відкрити?', id);
     const k = await ask(KINDS, id); if (id !== run) return; st.k = KINDS[k]; known.k = 1; push(true);
     await say(KIND_TXT[k], id);
-    await say(side(), id);
+    await say('А як назвете заклад? Напишіть — впишу в чек.', id);
+    const nm = await askName(id); if (id !== run) return;
+    if (nm) { known.n = nm; push(true); await say(`«${esc(nm)}» — звучить! Уже бачу вивіску. ${mob() ? 'Чек друкується трохи нижче 👇' : 'Дивіться праворуч — чек уже на вас 👉'}`, id); }
+    else await say(`Нічого, назву й концепцію теж розробимо разом — це входить у запуск. ${mob() ? 'Чек друкується трохи нижче 👇' : 'Дивіться праворуч — чек уже друкується 👉'}`, id);
     await say('Яка площа приміщення?', id);
     const a = await ask([...AREA, 'Ще не знаю'], id); if (id !== run) return;
     if (a < 4) { st.a = a; known.a = 1; } else { st.a = 0; known.aSkip = 1; }
@@ -584,7 +601,7 @@ const CONFIG = {
     if (id !== run) return;
     replies.innerHTML = ''; replies.classList.add('show', 'final');
     const go = document.createElement('button'); go.type = 'button'; go.className = 'go'; go.innerHTML = '<svg class="bell"><use href="#bell"/></svg>Передати чек шефу';
-    go.addEventListener('click', e => { window.__pasSet && window.__pasSet(st.a, st.k, st.p); window.__openModal && window.__openModal(e); });
+    go.addEventListener('click', e => { window.__pasSet && window.__pasSet(st.a, st.k, st.p); window.__openModal && window.__openModal(e); const mf = document.getElementById('m-for'); if (mf) { mf.textContent = known.n ? 'для «' + known.n + '»' : ''; mf.classList.toggle('on', !!known.n); } const m = document.getElementById('mf-msg'); if (m && !m.value) m.value = [known.n ? 'Назва: «' + known.n + '»' : '', 'Старт: ' + (known.w || '—')].filter(Boolean).join('. ') + '.'; });
     const again = document.createElement('button'); again.type = 'button'; again.textContent = 'Почати спочатку'; again.addEventListener('click', start);
     replies.append(go, again); scroll();
   }

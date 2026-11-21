@@ -3,18 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Пас — відкриття закладів під ключ від бренд-шефа Дмитра Барсука</title>
+<title>Пас — ваш заклад під ключ за 1,5–3 місяці · бренд-шеф Дмитро Барсук</title>
 <meta name="description" content="Відкриваємо кафе, ресторани, стрітфуд і кав'ярні під ключ по всій Україні: бізнес-план, приміщення, меню й техкарти, обладнання, команда. 20+ закладів з 2012 року. 1,5–3 місяці до відкриття.">
-<meta property="og:title" content="Пас — заклади під ключ від бренд-шефа">
-<meta property="og:description" content="Від техкарти до першої зміни. 20+ закладів по Україні з 2012 року.">
-<meta property="og:image" content="img/og.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Пас — заклади під ключ">
+<meta property="og:locale" content="uk_UA">
+<meta property="og:url" content="https://checklist.ss-sunrise.site/pas/">
+<meta property="og:title" content="Пас — ваш заклад під ключ за 1,5–3 місяці">
+<meta property="og:description" content="Бренд-шеф Дмитро Барсук: без франшизи й роялті, від $2 800 під ключ. 20+ закладів по Україні з 2012 року.">
+<meta property="og:image" content="https://checklist.ss-sunrise.site/pas/img/og-pas.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://checklist.ss-sunrise.site/pas/img/og-pas.jpg">
 <meta name="theme-color" content="#F3EEE5">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/lit.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/golos.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="img/d-duck-m.webp" media="(max-width:860px)">
 <link rel="preload" as="image" href="img/d-duck.webp" media="(min-width:861px)">
-<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="style.css?v=14">
 <script>document.documentElement.classList.replace('no-js','js');if(sessionStorage.getItem('pas-pre')||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('no-pre');</script>
 </head>
 <body>
@@ -89,7 +97,7 @@
     <div class="hero__steps" aria-hidden="true"><span>01</span><i><b></b></i><span>02</span><i><b></b></i><span>03</span></div>
     <div class="hero__end">
       <div>
-        <span class="mono" style="opacity:.7">пас [pas] — сущ.</span>
+        <span class="mono" style="opacity:.7">пас [пас] — ім.</span>
         <h2 style="margin-top:18px">Місце на кухні, звідки страва <em>йде до гостя</em></h2>
         <p>Якщо пас працює — працює весь заклад: кухня встигає, зал усміхається, каса рахує. Ми будуємо ваш заклад саме з цього місця.</p>
       </div>
@@ -186,7 +194,7 @@
 <section class="sec dark glow" id="kukhnia">
   <div class="wrap">
     <div class="sec-head">
-      <div><span class="label">За лаштунками відкриття</span><h2 style="margin-top:20px" data-split>Кухню гість не бачить. <em>Ми — бачимо першою</em></h2></div>
+      <div><span class="label">За лаштунками відкриття</span><h2 style="margin-top:20px" data-split>Кухню гість не бачить. <em>Ми бачимо її першими</em></h2></div>
       <p class="lead" data-r>Порожнє приміщення, обладнання в плівці, техкарти на столі — так виглядає заклад за кілька днів до запуску. Ми розставляємо цех так, щоб страва йшла до пасу без зайвих кроків.</p>
     </div>
     <div class="back">
@@ -331,7 +339,7 @@
     <div class="printer" data-r>
       <div class="printer__slot"></div>
       <div class="bill" id="bill">
-        <div class="bill__h"><b>ПАС</b>ЧЕК № <span id="bno">0412</span> · попередній</div>
+        <div class="bill__h"><b>ПАС</b>ЧЕК № <span id="bno">0412</span> · попередній<span class="bill__for" id="b-for"></span></div>
         <div class="bill__stamp">ПІД КЛЮЧ</div>
         <p><span>Формат</span><span id="b-kind">Стрітфуд</span></p>
         <p><span>Площа</span><span id="b-area">до 20 м²</span></p>
@@ -461,7 +469,7 @@
       <h3>Ваш заклад <em>вже в роботі</em></h3>
       <div class="mslot"></div>
       <div class="mmask"><div class="mbill" id="mbill">
-        <div class="mbill__h"><b>ПАС</b>ЗАМОВЛЕННЯ № <span id="m-no">0001</span></div>
+        <div class="mbill__h"><b>ПАС</b>ЗАМОВЛЕННЯ № <span id="m-no">0001</span><span class="bill__for" id="m-for"></span></div>
         <p><span>Формат</span><span id="m-kind">Стрітфуд</span></p>
         <p><span>Площа</span><span id="m-area">до 20 м²</span></p>
         <p><span>Приміщення</span><span id="m-place">вже є</span></p>
@@ -503,6 +511,6 @@
 <script src="js/gsap.min.js" defer></script>
 <script src="js/ScrollTrigger.min.js" defer></script>
 <script src="js/lenis.min.js" defer></script>
-<script src="app.js?v=12" defer></script>
+<script src="app.js?v=14" defer></script>
 </body>
 </html>
