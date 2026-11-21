@@ -101,7 +101,7 @@ const CONFIG = {
       .from('.hero .label, .hero__p, .hero__cta, .hero__meta, .hero__facts', { opacity: 0, y: 24, duration: 1, ease: 'power3.out', stagger: 0.08 }, 0.25)
       .fromTo('#heroMedia', { '--k': 0 }, { '--k': 1, duration: 1.5, ease: 'expo.out' }, 0.1)
       .from('.hero__ring', { opacity: 0, rotate: -40, scale: .8, duration: 1.6, ease: 'expo.out' }, 0.3)
-      .from('.hero__badge', { opacity: 0, y: 30, duration: 1, ease: 'power3.out' }, 0.8)
+      .from('.hero__chef', { opacity: 0, y: 30, duration: 1, ease: 'power3.out' }, 0.8)
       .from('.stage--1 img', { scale: 1.4, duration: 2, ease: 'expo.out' }, 0.1);
   };
   const pre = $('.pre');
@@ -151,7 +151,7 @@ const CONFIG = {
       .fromTo(media, { '--r': g.r + 'px', '--x': g.x + '%', '--y': g.y + '%' }, { '--r': R + 'px', '--x': '50%', '--y': '50%', duration: 1, ease: 'power2.inOut' }, 0)
       .to('.hero__copy', { opacity: 0, y: -90, duration: .55, ease: 'power1.in' }, 0)
       .to('.hero__ring', { opacity: 0, scale: 1.6, duration: .5 }, 0)
-      .to('.hero__badge,.scrollhint', { opacity: 0, duration: .25 }, 0)
+      .to('.hero__chef,.scrollhint', { opacity: 0, duration: .25 }, 0)
       .fromTo('.stage--1 img', { scale: 1.15 }, { scale: 1, duration: 1.6 }, 0)
       .fromTo('.stage--1', { '--sh': 0 }, { '--sh': 1, duration: .7 }, .25)
       .to('.cap.c1', { opacity: 1, y: 0, duration: .35 }, .75)

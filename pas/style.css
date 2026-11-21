@@ -575,3 +575,21 @@ h2 em,h1 em{font-style:italic;font-weight:400;color:var(--red)}
 .loss li.in .loss__x span,.reduce .loss__x span{background-size:100% 2.5px}
 @media(max-width:860px){.loss__x span{background-size:100% 2.5px}}
 .vs{margin:0 auto}
+
+/* v7 — chef card in hero */
+.hero__chef{position:absolute;z-index:6;left:calc(var(--x,73%) - var(--r0,19vmax)*1.18);top:calc(var(--y,52%) + var(--r0,19vmax)*.18);width:170px;background:var(--card);padding:10px 10px 12px;box-shadow:0 26px 50px -22px rgba(0,0,0,.45);transform:rotate(-4deg);transition:transform .5s var(--ease)}
+.hero__chef:hover{transform:rotate(-1deg) translateY(-4px)}
+.hero__chef::before{content:"";position:absolute;left:50%;top:-9px;width:54px;height:18px;margin-left:-27px;background:rgba(201,58,32,.85);transform:rotate(3deg)}
+.hero__chef-ph{display:block;aspect-ratio:4/5;overflow:hidden;background:var(--ink)}
+.hero__chef-ph img{width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.hero__chef-t{display:block;padding-top:10px;line-height:1.25}
+.hero__chef-t b{display:block;font-family:var(--serif);font-weight:500;font-size:17px}
+.hero__chef-t span{display:block;margin-top:3px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+@media(max-width:860px){
+  .hero__chef{width:104px;padding:6px 6px 8px;left:auto;right:calc(var(--pad) - 4px);top:calc(var(--y,70%) - var(--r0,190px)*1.18);transform:rotate(5deg)}
+  .hero__chef::before{width:40px;height:13px;margin-left:-20px;top:-7px}
+  .hero__chef-t{padding-top:6px}
+  .hero__chef-t b{font-size:12px}
+  .hero__chef-t span{font-size:7.5px;letter-spacing:.03em}
+  .stage--1 img{height:135%;object-position:60% 20%}
+}
