@@ -67,7 +67,7 @@ const CONFIG = {
     return $$('.w>span', el);
   }
   const css = document.createElement('style');
-  css.textContent = '[data-split] .w,.h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em;margin-bottom:-.1em}[data-split] .w>span,.h1 .w>span{display:inline-block}';
+  css.textContent = '[data-split] .w,.h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.24em;margin-bottom:-.24em}[data-split] .w>span,.h1 .w>span{display:inline-block}';
   document.head.appendChild(css);
 
   const h1Words = split($('.h1'));
