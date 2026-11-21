@@ -612,3 +612,10 @@ const CONFIG = {
   io.observe(document.querySelector('.phone'));
 })();
 (() => { const ph = document.querySelector('.phone'); if (!ph) return; new IntersectionObserver(es => es.forEach(e => document.body.classList.toggle('chat-on', e.isIntersecting)), { threshold: .15 }).observe(ph); })();
+(() => {
+  const t = document.getElementById('themeT'); if (!t) return;
+  const root = document.documentElement, meta = document.querySelector('meta[name="theme-color"]');
+  const sync = () => { const d = root.classList.contains('theme-dark'); t.setAttribute('aria-label', d ? 'Світла тема' : 'Темна тема'); if (meta) meta.content = d ? '#0F0D0B' : '#F3EEE5'; };
+  sync(); requestAnimationFrame(() => root.classList.add('theme-ready'));
+  t.addEventListener('click', () => { root.classList.toggle('theme-dark'); try { localStorage.setItem('pas-theme', root.classList.contains('theme-dark') ? 'dark' : 'light'); } catch (e) {} sync(); });
+})();
