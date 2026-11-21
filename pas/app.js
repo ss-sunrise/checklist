@@ -412,6 +412,7 @@ const CONFIG = {
       .to('.modal__bg', { opacity: 0, duration: .5 }, .15);
   }
   window.__openModal = openModal;
+  $$('.hero__cta a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); e.stopImmediatePropagation(); openModal(e); }, true));
   window.__pasSet = (a, k, p) => { st8.a = a; st8.k = k; st8.p = p; syncCalcButtons(); render(false); };
   window.__pasChat = (st, known, print) => {
     st8.a = st.a; st8.k = st.k; st8.p = st.p; render(print);
