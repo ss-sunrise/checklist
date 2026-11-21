@@ -411,6 +411,7 @@ const CONFIG = {
       .to('.modal__bg', { opacity: 0, duration: .5 }, .15);
   }
   window.__openModal = openModal;
+  window.__pasSet = (a, k, p) => { st8.a = a; st8.k = k; st8.p = p; syncCalcButtons(); render(false); };
   $$('[data-close]', modal).forEach(b => b.addEventListener('click', closeModal));
   addEventListener('keydown', e => {
     if (!isOpen) return;
@@ -499,3 +500,89 @@ const CONFIG = {
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -30% 0px' });
   items.forEach(i => io.observe(i));
 })();
+
+/* v8 — chat with chef (quiz + bill) */
+(() => {
+  const feed = document.getElementById('chatFeed'), replies = document.getElementById('chatReplies'), status = document.getElementById('chatStatus');
+  if (!feed) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PRICE = [2800, 3300, 3600, 4800];
+  const INV = ['$10 000 – 18 000', '$15 000 – 25 000', '$20 000 – 40 000', '$35 000 – 65 000'];
+  const AREA = ['до 20 м²', '20–40 м²', '40–60 м²', '60–80 м²'];
+  const fmt$ = v => '$' + String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const now = () => { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+  let run = 0;
+  const st = { k: 'Стрітфуд', a: 0, aKnown: true, p: 'вже є', when: '' };
+  const scroll = () => feed.scrollTo({ top: feed.scrollHeight, behavior: reduce ? 'auto' : 'smooth' });
+  const bubble = (who, html, cls = '') => {
+    const b = document.createElement('div'); b.className = `msg msg--${who} ${cls}`;
+    b.innerHTML = `<div class="msg__b">${html}<span class="msg__t">${now()}${who === 'me' ? ' <i>✓✓</i>' : ''}</span></div>`;
+    feed.appendChild(b); requestAnimationFrame(() => b.classList.add('in')); scroll(); return b;
+  };
+  async function say(text, id) {
+    if (id !== run) return;
+    status.textContent = 'друкує…'; status.classList.add('typing');
+    const t = document.createElement('div'); t.className = 'msg msg--chef in'; t.innerHTML = '<div class="msg__b typing"><i></i><i></i><i></i></div>';
+    feed.appendChild(t); scroll();
+    await wait(Math.min(1500, 500 + text.length * 14));
+    t.remove(); if (id !== run) return;
+    status.textContent = 'онлайн'; status.classList.remove('typing');
+    bubble('chef', text); await wait(350);
+  }
+  const ask = (opts, id) => new Promise(res => {
+    if (id !== run) return;
+    replies.innerHTML = ''; replies.classList.add('show');
+    opts.forEach((o, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.style.transitionDelay = (i * 50) + 'ms'; b.addEventListener('click', () => { replies.classList.remove('show'); replies.innerHTML = ''; bubble('me', o); res(i); }); replies.appendChild(b); });
+    scroll();
+  });
+  const KINDS = ['Стрітфуд', 'Кав’ярня', 'Кафе', 'Піцерія / суші', 'Ресторан / паб'];
+  const KIND_TXT = [
+    'Гарний старт: невелика площа й швидкий запуск. Але тут усе вирішує локація — її порахуємо першою.',
+    'У кав’ярні гроші в каві й десертах. Меню зробимо так, щоб гість брав ще щось до чашки.',
+    'Кафе — це баланс кухні й залу. Плануємо цех так, щоб на пасі не було черги.',
+    'Тут половина успіху — доставка й упаковка. Закладемо їх у меню й кухню з першого дня.',
+    'Великий формат — більше команди й процесів. Я запускав формати Red Cat — від фуд-корту до пивного ресторану.'
+  ];
+  async function start() {
+    const id = ++run; feed.innerHTML = ''; replies.innerHTML = ''; replies.className = 'phone__replies'; status.textContent = 'онлайн';
+    const day = document.createElement('div'); day.className = 'msg__day'; day.textContent = 'сьогодні'; feed.appendChild(day);
+    await say('Вітаю! Я Дмитро Барсук, бренд-шеф 👨‍🍳', id);
+    await say('Давайте за хвилину прикинемо ваш заклад. Що хочете відкрити?', id);
+    const k = await ask(KINDS, id); if (id !== run) return; st.k = KINDS[k];
+    await say(KIND_TXT[k], id);
+    await say('Яка площа приміщення?', id);
+    const a = await ask([...AREA, 'Ще не знаю'], id); if (id !== run) return;
+    st.aKnown = a < 4; st.a = a < 4 ? a : 0;
+    await say(st.aKnown ? 'Зрозумів. Під цю площу вже можу назвати порядок цифр.' : 'Нормально, з цього багато хто починає. Порахую від мінімальної площі — далі уточнимо.', id);
+    await say('Приміщення вже є?', id);
+    const p = await ask(['Так, вже є', 'Ні, треба знайти'], id); if (id !== run) return;
+    st.p = p === 0 ? 'вже є' : 'треба знайти';
+    await say(p === 0 ? 'Супер. Тоді почнемо з аналізу локації й аудиторії — щоб формат точно окупився саме там.' : 'Допоможу знайти й прорахувати. Головне — не підписувати оренду, поки не зрозуміло, що там відкривати.', id);
+    await say('І останнє: коли хочете відкритися?', id);
+    const w = await ask(['Якнайшвидше', 'За 2–3 місяці', 'Поки думаю'], id); if (id !== run) return;
+    await say(w === 2 ? 'Чесно: так і варто — спершу цифри, потім рішення. Перша розмова ні до чого не зобов’язує.' : 'Реально: 1,5–3 місяці від договору до першої зміни. Терміни фіксуємо в договорі.', id);
+    await say('Тримайте попередній чек 👇', id);
+    if (id !== run) return;
+    const inv = st.aKnown ? INV[st.a] : 'залежить від площі';
+    const price = st.aKnown ? fmt$(PRICE[st.a]) : 'від ' + fmt$(PRICE[0]);
+    const no = String(1000 + Math.floor(Math.random() * 8999));
+    const b = bubble('chef', `<div class="cbill"><div class="cbill__h"><b>ПАС</b>ЧЕК № ${no} · попередній</div><div class="cbill__stamp">ПІД КЛЮЧ</div>
+      <p><span>Формат</span><span>${st.k}</span></p><p><span>Площа</span><span>${st.aKnown ? AREA[st.a] : 'уточнимо'}</span></p><p><span>Приміщення</span><span>${st.p}</span></p>
+      <p><span>Термін</span><span>1,5–3 міс</span></p><p><span>Супровід</span><span>1 міс після відкриття</span></p><p><span>Інвестиції</span><span>${inv}</span></p>
+      <p class="big"><span>Послуги «Пас»</span><b>${price}</b></p></div>`, 'msg--bill');
+    await wait(1300);
+    await say('Залиште номер — зателефоную й порахую точно під вашу локацію.', id);
+    if (id !== run) return;
+    replies.innerHTML = ''; replies.classList.add('show', 'final');
+    const go = document.createElement('button'); go.type = 'button'; go.className = 'go'; go.innerHTML = '<svg class="bell"><use href="#bell"/></svg>Передати чек шефу';
+    go.addEventListener('click', e => { window.__pasSet && window.__pasSet(st.a, st.k, st.p); window.__openModal && window.__openModal(e); });
+    const again = document.createElement('button'); again.type = 'button'; again.textContent = 'Почати спочатку'; again.addEventListener('click', start);
+    replies.append(go, again); scroll();
+  }
+  document.getElementById('chatRestart').addEventListener('click', start);
+  let started = false;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !started) { started = true; start(); io.disconnect(); } }), { threshold: .35 });
+  io.observe(document.querySelector('.phone'));
+})();
+(() => { const ph = document.querySelector('.phone'); if (!ph) return; new IntersectionObserver(es => es.forEach(e => document.body.classList.toggle('chat-on', e.isIntersecting)), { threshold: .15 }).observe(ph); })();
